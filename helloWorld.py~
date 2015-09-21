@@ -125,7 +125,7 @@ class Individual(object):
 
     def __str__(self):
         wayToDisplay = []
-        for i in range (len(self.way)):
+        for i in range (len(self.way) - 1):
             wayToDisplay.append(safe_list_get(self.way, i, "lol"))
         return str(wayToDisplay ) + " " + str(self.totalValue)
 
