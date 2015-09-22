@@ -4,23 +4,37 @@ $(function () {
             type: 'column'
         },
         title: {
-            text: 'Column chart with negative values'
+            text: 'Comparison of the final rates'
         },
-        xAxis: {
-            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+        subtitle: {
+            text: 'DNF'
         },
-        credits: {
-            enabled: false
+
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Rate (USD)'
+            }
         },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        animation : truee,
         series: [{
-            name: 'John',
-            data: [5, 3, 4, 7, 2]
+            name: 'Bellman-Ford',
+            data: [49.9]
+
         }, {
-            name: 'Jane',
-            data: [1, -2, -3, 2, 1]
+            name: 'Genetic Algorithm',
+            data: [83.6]
+
         }, {
-            name: 'Joe',
-            data: [3, 4, 4, -2, 5]
+            name: 'Recuit',
+            data: [34.6]
+
         }]
     });
 });
