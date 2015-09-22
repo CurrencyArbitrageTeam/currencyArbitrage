@@ -27,29 +27,29 @@ def safe_list_get (l, idx, default):
     except IndexError:
         return default
 
-def bellmanFord(currency):
-    tab=matrix = [[0]*4 for i in range(4)]
+def bellmanFord(currency,nb_currencies):
+    tab=matrix = [[0]*nb_currencies for i in range(nb_currencies)]
     listOfRate = ["USD","JPY", "BTC", "EUR"]
-    for i in range(0,4):
-        for j in range(0,4):
+    for i in range(0,nb_currencies):
+        for j in range(0,nb_currencies):
           tab[i][j]=currency.getRateFromTo(listOfRate[i],listOfRate[j]).value
 
-    for i in range(0,4):
-        for j in range(0,4):
+    for i in range(0,nb_currencies):
+        for j in range(0,nb_currencies):
             tab[i][j]= -math.log(tab[i][j])
 
     dis = []
     pre = []
 
-    for i in range(0,4):
+    for i in range(0,nb_currencies):
         dis.append(float("infinity"))
         pre.append(-1)
 
     dis[0]=0
 
-    for k in range(0,4):
-        for i in range(0,4):
-            for j in range(0,4):
+    for k in range(0,nb_currencies):
+        for i in range(0,nb_currencies):
+            for j in range(0,nb_currencies):
                 if(dis[i]+tab[i][j] < dis[j]):
                     dis[j]=dis[i]+tab[i][j]
                     pre[j]=i
@@ -57,8 +57,8 @@ def bellmanFord(currency):
 
     findCycle = False
     cycle = []
-    for i in range(0,4):
-        for j in range(0,4):
+    for i in range(0,nb_currencies):
+        for j in range(0,nb_currencies):
             if(dis[i]+tab[i][j]<dis[j]):
                 findCycle = True
                 start = i
@@ -235,7 +235,7 @@ class Index(object):
         currencies = Currencies()
         individual = Individual(currencies)
         t0 = time.time()
-        cycle = bellmanFord(currencies)
+        cycle = bellmanFord(currencies,4)
         testBellmanFord = Individual(currencies)
         testBellmanFord.setWay(cycle)
         testBellmanFord.setTotalValue(currencies)
