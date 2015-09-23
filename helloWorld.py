@@ -50,9 +50,10 @@ def bellmanFord(currency,nb_currencies):
     for k in range(0,nb_currencies):
         for i in range(0,nb_currencies):
             for j in range(0,nb_currencies):
-                if(dis[i]+tab[i][j] < dis[j]):
-                    dis[j]=dis[i]+tab[i][j]
-                    pre[j]=i
+                if(j != i):
+                    if(dis[i]+tab[i][j] < dis[j]):
+                        dis[j]=dis[i]+tab[i][j]
+                        pre[j]=i
 
 
     findCycle = False
@@ -64,12 +65,20 @@ def bellmanFord(currency,nb_currencies):
                 start = i
 
 
+
     if(findCycle):
         z = start
         cycle.append(listOfRate[z])
+        count = 0
         while (pre[z] != start):
+            count = count + 1
             z = pre[z]
             cycle.append(listOfRate[z])
+            if (count > nb_currencies + 1):
+                print("Error need to check that")
+                for i in range(0,nb_currencies):
+                    print(pre[i])
+                break
         cycle.append(listOfRate[pre[z]])
 
 
@@ -98,11 +107,9 @@ class Individual(object):
         totalValue = 1
         newWay = self.way
         newWay = [elem for elem in self.way if elem != "NONE"]
-        print newWay
         waySize = len(newWay)
         for i in range (1, waySize):
             totalValue = currency.getRateFromTo(safe_list_get(newWay, i - 1, "lol"), safe_list_get(newWay, i, "lol")).value * totalValue
-        print self.way
         return totalValue
 
     def __init__(self, currency):
@@ -113,7 +120,6 @@ class Individual(object):
             way.append(random.choice(listOfRate))
         way.append("USD")
         self.way = way
-        print way
         self.cleanWay()
         self.totalValue = self.getToTalValue(currency)
 
@@ -136,7 +142,6 @@ class Individual(object):
         totalValue = 1
         for i in range (0, len(self.way)-1):
             totalValue = totalValue * currency.getRateFromTo(self.way[i],self.way[i+1]).value
-            print(totalValue)
         self.totalValue = totalValue
 
 class Population():
