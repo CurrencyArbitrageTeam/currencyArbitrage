@@ -264,6 +264,7 @@ class Currencies(object):
 class Index(object):
     def GET(self):
         currencies = Currencies()
+        individual = Individual(currencies)
         t0_anneal = time.time()
         res = anneal(currencies,4)
         t_final_anneal = time.time() - t0_anneal
@@ -273,13 +274,11 @@ class Index(object):
         testBellmanFord = Individual(currencies)
         testBellmanFord.setWay(cycle)
         testBellmanFord.setTotalValue(currencies)
-        print("BellmanFord : ")
-        print(testBellmanFord)
-        print(t_final_bellman)
-        print("Anneal")
-        print(res)
-        print(t_final_anneal)
-        return static.index(res = currencies, random = individual,negativeWay = testBellmanFord,time = time.time() - t0,bftime = t_final_bellman)
+        data = {"bf" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way }}
+        with open('static/result.js', 'w') as outfile:
+                outfile.write("var json =")
+                json.dump(data, outfile)
+        return static.index(res = currencies, random = individual ,negativeWay = testBellmanFord, bfTime = t_final_bellman)
 
 
 if __name__ == "__main__":

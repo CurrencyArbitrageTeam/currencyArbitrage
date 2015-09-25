@@ -1,13 +1,14 @@
+var jsonValue = json
 $(function () {
-    $('#container').highcharts({
+    $('#rate').highcharts({
         chart: {
             type: 'column'
         },
         title: {
-            text: 'Comparison of the final rates'
+            text: 'Currency arbitrage'
         },
         subtitle: {
-            text: 'DNF'
+            text: 'Comparison of the final rates'
         },
 
         yAxis: {
@@ -22,18 +23,61 @@ $(function () {
                 borderWidth: 0
             }
         },
-        animation : truee,
+        animation : true,
         series: [{
             name: 'Bellman-Ford',
-            data: [49.9]
+            data: [jsonValue.bf.totalRate]
 
         }, {
             name: 'Genetic Algorithm',
-            data: [83.6]
+            data: [1]
 
         }, {
             name: 'Recuit',
-            data: [34.6]
+            data: [1]
+
+        }]
+    });
+});
+
+
+var jsonValue = json
+$(function () {
+    $('#time').highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Currency arbitrage'
+        },
+        subtitle: {
+            text: 'Comparison of the time taken'
+        },
+
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'time'
+            }
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        animation : true,
+        series: [{
+            name: 'Bellman-Ford',
+            data: [jsonValue.bf.timer]
+
+        }, {
+            name: 'Genetic Algorithm',
+            data: [0.0001]
+
+        }, {
+            name: 'Recuit',
+            data: [0.0001]
 
         }]
     });

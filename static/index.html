@@ -1,15 +1,14 @@
-$def with (res, random, negativeWay,time)
+$def with (res, random, negativeWay,bfTime)
 <!doctype html>
 <html>
     <head>
       <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
       <script src="http://code.highcharts.com/highcharts.js"></script>
+      <script type="text/javascript" src="static/result.js"></script>
       <script type="text/javascript" src="static/histogram.js"></script>
     </head>
     <body>
 
-
-<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
 <style type="text/css">
 tr > td {
@@ -85,9 +84,11 @@ div#tableAndButton {
         </table>
         $random <br>
         BellmanFord gave us this way $negativeWay <br>
-        bidboudou for BellmanFord is : $time seconds
+        bidboudou for BellmanFord is : $bfTime seconds
     </div>
 
+    <div id="rate" style="width: 800px; height: 400px; margin: 0 auto"></div>
+    <div id="time" style="width: 800px; height: 400px; margin: 0 auto"></div>
 
 
     </body>
