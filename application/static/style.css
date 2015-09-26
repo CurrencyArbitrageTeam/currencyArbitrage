@@ -1,0 +1,36 @@
+body {
+    background:
+        linear-gradient(45deg, hsla(78, 99%, 67%, 1) 0%, hsla(78, 99%, 67%, 0) 70%),
+        linear-gradient(135deg, hsla(195, 92%, 41%, 1) 10%, hsla(195, 92%, 41%, 0) 80%),
+        linear-gradient(225deg, hsla(16, 91%, 77%, 1) 10%, hsla(16, 91%, 77%, 0) 80%),
+        linear-gradient(315deg, hsla(23, 93%, 78%, 1) 100%, hsla(23, 93%, 78%, 0) 70%);
+
+}
+
+#footer {
+  position:fixed;
+  bottom:0;
+    width:100%;
+    display:block;
+}
+
+
+tr > td {
+padding: 8px;
+border: 1px solid #ddd;
+text-align: center;
+}
+
+table#rates {
+text-align: center;
+margin: auto;
+margin-top: 20px;
+margin-bottom: 20px;
+}
+
+div#tableAndButton {
+    text-align: center;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

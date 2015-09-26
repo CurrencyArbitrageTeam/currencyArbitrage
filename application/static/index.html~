@@ -1,8 +1,7 @@
-$def with (res)
+$def with (res, random, negativeWay,bfTime)
 <!doctype html>
 <html>
     <head>
-      <link rel="stylesheet" type="text/css" href="static/style.css">
       <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
       <script src="http://code.highcharts.com/highcharts.js"></script>
       <script type="text/javascript" src="static/result.js"></script>
@@ -10,6 +9,28 @@ $def with (res)
     </head>
     <body>
 
+
+<style type="text/css">
+tr > td {
+padding: 8px;
+border: 1px solid #ddd;
+text-align: center;
+}
+
+table#rates {
+text-align: center;
+margin: auto;
+margin-top: 20px;
+margin-bottom: 20px;
+}
+
+div#tableAndButton {
+    text-align: center;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+</style>
     <div id = "tableAndButton">
         <table id="rates">
           <tr>
@@ -61,13 +82,14 @@ $def with (res)
             <td>$1</td>
           </tr>
         </table>
+        $random <br>
+        BellmanFord gave us this way $negativeWay <br>
+        bidboudou for BellmanFord is : $bfTime seconds
     </div>
-    <table cellspacing="80" align = "center">
-      <tr>
-        <td style="background-color:white;border-radius: 32px"><div id="rate" style="width: 600px; height: 400px; margin: 0 auto"></div></td>
-        <td style="background-color:white;border-radius: 32px"><div id="time" style="width: 600px; height: 400px; margin: 0 auto"></div></td>
-      </tr>
-    </table>
+
+    <div id="rate" style="width: 800px; height: 400px; margin: 0 auto"></div>
+    <div id="time" style="width: 800px; height: 400px; margin: 0 auto"></div>
+
 
     </body>
 </html>
