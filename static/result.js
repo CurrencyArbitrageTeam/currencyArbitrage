@@ -1,1 +1,0 @@
-var json ={"bf": {"totalRate": 1.0736656669140985, "way": ["EUR", "USD", "BTC", "EUR"], "timer": 5.412101745605469e-05}}
