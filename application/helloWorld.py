@@ -29,7 +29,7 @@ def safe_list_get (l, idx, default):
 
 def bellmanFord(currency,nb_currencies):
     tab=matrix = [[0]*nb_currencies for i in range(nb_currencies)]
-    listOfRate = ["USD","JPY", "GBP", "EUR"]
+    listOfRate = ["USD","EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
     for i in range(0,nb_currencies):
         for j in range(0,nb_currencies):
           tab[i][j]=currency.getRateFromTo(listOfRate[i],listOfRate[j]).value
@@ -134,9 +134,9 @@ class Individual(object):
 
     def __init__(self, currency):
         way = []
-        listOfRate = ["JPY", "GBP", "EUR"]
+        listOfRate = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
         way.append("USD")
-        for i in range (1,4):
+        for i in range (0,9):
             way.append(random.choice(listOfRate))
         way.append("USD")
         self.way = way
@@ -144,8 +144,8 @@ class Individual(object):
         self.totalValue = self.getToTalValue(currency)
 
     def changeNeighbor(self,currencies,nb_currencies):
-        listOfRate = ["JPY", "GBP", "EUR","NONE"]
-        self.way[randint(1,nb_currencies - 1)]=listOfRate[randint(0,3)]
+        listOfRate = ["USD","EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+        self.way[randint(1,nb_currencies - 1)]=listOfRate[randint(0,8)]
         self.cleanWay()
         self.totalValue = self.getToTalValue(currencies)
 
@@ -174,6 +174,12 @@ class Individual(object):
 
 class Currencies(object):
 
+    table = [[0]*2 for i in range(0,3)]
+    table[0][0]= 1
+    table[1][0]= 1
+    table[0][1]= 1
+    table[1][1]= 1
+
     def __init__ (self):
         with open('currencies.json') as data_file:
             res = json.load(data_file)
@@ -183,12 +189,11 @@ class Currencies(object):
         self.USD_USD = Rate(1.000000, "USD", "USD")
         self.JPY_JPY = Rate(1.000000, "JPY", "JPY")
         self.GBP_GBP = Rate(1.000000, "GBP", "GBP")
-        self.EUR_EUR = Rate(1.000000, "CHF", "CHF")
-        self.USD_USD = Rate(1.000000, "AUD", "AUD")
-        self.JPY_JPY = Rate(1.000000, "CNY", "CNY")
-        self.GBP_GBP = Rate(1.000000, "GBP", "GBP")
-        self.GBP_GBP = Rate(1.000000, "KYD", "KYD")
-
+        self.CHF_CHF = Rate(1.000000, "CHF", "CHF")
+        self.AUD_AUD = Rate(1.000000, "AUD", "AUD")
+        self.CNY_CNY = Rate(1.000000, "CNY", "CNY")
+        self.HKD_HKD = Rate(1.000000, "HKD", "HKD")
+        self.KYD_KYD = Rate(1.000000, "KYD", "KYD")
     def getRateFromTo(self, fromCurrency, toCurrency):
         return getattr(self, fromCurrency + "_" + toCurrency)
 
@@ -197,16 +202,17 @@ class Index(object):
         currencies = Currencies()
         individual = Individual(currencies)
         t0_anneal = time.time()
-        res_anneal = anneal(currencies,4)
+        res_anneal = anneal(currencies,9)
         t_final_anneal = time.time() - t0_anneal
         t0_bellman = time.time()
-        cycle = bellmanFord(currencies,4)
+        cycle = bellmanFord(currencies,9)
         t_final_bellman = time.time() - t0_bellman
         testBellmanFord = Individual(currencies)
         testBellmanFord.setWay(cycle)
         testBellmanFord.setTotalValue(currencies)
         data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way}
         }
+        print(len(vars(currencies)))
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)

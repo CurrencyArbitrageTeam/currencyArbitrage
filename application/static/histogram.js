@@ -15,7 +15,7 @@ $(function () {
         },
 
         yAxis: {
-            min: 0.99999,
+            min: 1,
             title: {
                 text: 'Rate (USD)'
             }

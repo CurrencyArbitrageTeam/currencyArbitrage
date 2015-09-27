@@ -1,1 +1,1 @@
-var json ={"BellmanFord": {"totalRate": 1.00000115696, "way": ["EUR", "JPY", "EUR"], "timer": 9.894371032714844e-05}, "Annealing": {"totalRate": 0.9999995376, "way": ["USD", "NONE", "NONE", "EUR", "USD"], "timer": 0.5708260536193848}}
+var json ={"BellmanFord": {"totalRate": 1.00000345608, "way": ["KYD", "CNY", "KYD"], "timer": 0.0002582073211669922}, "Annealing": {"totalRate": 1.0000028682370474, "way": ["USD", "EUR", "AUD", "NONE", "CHF", "KYD", "JPY", "NONE", "NONE", "NONE", "USD"], "timer": 8.019776821136475}}
