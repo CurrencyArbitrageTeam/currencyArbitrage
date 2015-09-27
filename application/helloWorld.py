@@ -29,7 +29,7 @@ def safe_list_get (l, idx, default):
 
 def bellmanFord(currency,nb_currencies):
     tab=matrix = [[0]*nb_currencies for i in range(nb_currencies)]
-    listOfRate = ["USD","JPY", "BTC", "EUR"]
+    listOfRate = ["USD","JPY", "GBP", "EUR"]
     for i in range(0,nb_currencies):
         for j in range(0,nb_currencies):
           tab[i][j]=currency.getRateFromTo(listOfRate[i],listOfRate[j]).value
@@ -134,7 +134,7 @@ class Individual(object):
 
     def __init__(self, currency):
         way = []
-        listOfRate = ["JPY", "BTC", "EUR"]
+        listOfRate = ["JPY", "GBP", "EUR"]
         way.append("USD")
         for i in range (1,4):
             way.append(random.choice(listOfRate))
@@ -144,7 +144,7 @@ class Individual(object):
         self.totalValue = self.getToTalValue(currency)
 
     def changeNeighbor(self,currencies,nb_currencies):
-        listOfRate = ["JPY", "BTC", "EUR","NONE"]
+        listOfRate = ["JPY", "GBP", "EUR","NONE"]
         self.way[randint(1,nb_currencies - 1)]=listOfRate[randint(0,3)]
         self.cleanWay()
         self.totalValue = self.getToTalValue(currencies)
@@ -172,94 +172,25 @@ class Individual(object):
             totalValue = totalValue * currency.getRateFromTo(wayWithoutNone[i],wayWithoutNone[i+1]).value
         self.totalValue = totalValue
 
-class Population():
-    individuals = []
-
-    def getBest5Indivuals(self):
-        sortedIndividuals = sorted(self.individuals)
-        best = []
-        for i in range (4, 10):
-            best.append(safe_list_get(sortedIndividuals, i, "lol"))
-        return best
-
-    def crossOver(self, listOfIndividuals, currencies):
-        crossedIndividuals = []
-        for i in range(0,2):
-            individual1 = copy.deepcopy(safe_list_get(listOfIndividuals, randint(0,5), "lol"))
-            individual2 = copy.deepcopy(safe_list_get(listOfIndividuals, randint(0,5), "lol"))
-            crossPosition = 2
-            DNAson1 = []
-            DNAson2 = []
-            for i in range(0, crossPosition):
-                DNAson1.append(safe_list_get(individual1.way, i, "lol"))
-                DNAson2.append(safe_list_get(individual2.way, i, "lol"))
-            DNAson1.append(currencies.getRateFromTo(safe_list_get(individual1.way, crossPosition - 1, "lol").toCurrency, safe_list_get(individual2.way, crossPosition + 1, "lol").fromCurrency))
-            DNAson2.append(currencies.getRateFromTo(safe_list_get(individual2.way, crossPosition - 1, "lol").toCurrency, safe_list_get(individual1.way, crossPosition + 1, "lol").fromCurrency))
-            for i in range(crossPosition + 1, 3):
-                DNAson1.append(safe_list_get(individual2.way, i, "lol"))
-                DNAson2.append(safe_list_get(individual1.way, i, "lol"))
-            individual1.setWay(DNAson1)
-            individual2.setWay(DNAson2)
-            individual1.setTotatlValue()
-            individual2.setTotatlValue()
-            crossedIndividuals.append(individual1)
-            crossedIndividuals.append(individual2)
-        return crossedIndividuals
-
-    def mutation(self):
-        print("mutation")
-
-    def __init__(self, setOfIndividuals):
-        self.individuals = setOfIndividuals
-
-    def __str__(self):
-        valueToDisplay = ""
-        for i in range(0,10):
-            valueToDisplay = valueToDisplay + str(safe_list_get(self.individuals, i, "lol"))
-            valueToDisplay = valueToDisplay + "\n"
-        return valueToDisplay
-
 class Currencies(object):
 
     def __init__ (self):
-        try:
-            rates = urllib2.urlopen("http://fx.priceonomics.com/v1/rates/")
-        except urllib2.URLError as e:
-            return e.reasonx
-        res = json.load(rates)
-        self.EURToEUR = Rate(1.000000, "EUR", "EUR")
-        self.USDToUSD = Rate(1.000000, "USD", "USD")
-        self.JPYToJPY = Rate(1.000000, "JPY", "JPY")
-        self.BTCToBTC = Rate(1.000000, "BTC", "BTC")
-        self.EURToUSD = Rate(float(res['EUR_USD']), "EUR", "USD")
-        self.EURToJPY = Rate(float(res['EUR_JPY']), "EUR", "JPY")
-        self.EURToBTC = Rate(float(res['EUR_BTC']), "EUR", "BTC")
-        self.USDToEUR = Rate(float(res['USD_EUR']), "USD", "EUR")
-        self.USDToBTC = Rate(float(res['USD_BTC']), "USD", "BTC")
-        self.USDToJPY = Rate(float(res['USD_JPY']), "USD", "JPY")
-        self.BTCToEUR = Rate(float(res['BTC_EUR']), "BTC", "EUR")
-        self.BTCToJPY = Rate(float(res['BTC_JPY']), "BTC", "JPY")
-        self.BTCToUSD = Rate(float(res['BTC_USD']), "BTC", "USD")
-        self.JPYToEUR = Rate(float(res['JPY_EUR']), "JPY", "EUR")
-        self.JPYToUSD = Rate(float(res['JPY_USD']), "JPY", "USD")
-        self.JPYToBTC = Rate(float(res['JPY_BTC']), "JPY", "BTC")
-
-    def getRandomRateFromACurrency(self, currency):
-        return random.choice([v for attr, v in vars(self).items()if len(attr) == 8 and attr[0:3] == currency])
-
-    def getRandomRateToUSD(self, currency):
-        if(currency == "JPY"):
-            return self.JPYToUSD
-        if(currency == "BTC"):
-            return self.BTCToUSD
-        if(currency == "EUR"):
-            return self.EURToUSD
+        with open('currencies.json') as data_file:
+            res = json.load(data_file)
+        for key, value in res.iteritems():
+            setattr(self, key, Rate(value, key[0:3], key[4:7]))
+        self.EUR_EUR = Rate(1.000000, "EUR", "EUR")
+        self.USD_USD = Rate(1.000000, "USD", "USD")
+        self.JPY_JPY = Rate(1.000000, "JPY", "JPY")
+        self.GBP_GBP = Rate(1.000000, "GBP", "GBP")
+        self.EUR_EUR = Rate(1.000000, "CHF", "CHF")
+        self.USD_USD = Rate(1.000000, "AUD", "AUD")
+        self.JPY_JPY = Rate(1.000000, "CNY", "CNY")
+        self.GBP_GBP = Rate(1.000000, "GBP", "GBP")
+        self.GBP_GBP = Rate(1.000000, "KYD", "KYD")
 
     def getRateFromTo(self, fromCurrency, toCurrency):
-        return getattr(self, fromCurrency + "To" + toCurrency)
-
-    def getRandomRate(self):
-        return random.choice([v for attr, v in vars(self).items()if len(attr) == 8 and attr[3:5] == 'To'])
+        return getattr(self, fromCurrency + "_" + toCurrency)
 
 class Index(object):
     def GET(self):
