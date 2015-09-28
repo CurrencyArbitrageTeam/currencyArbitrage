@@ -1,4 +1,4 @@
-$def with (res)
+$def with (res, listOfRate)
 <!doctype html>
 <html>
     <head>
@@ -9,60 +9,33 @@ $def with (res)
       <script type="text/javascript" src="static/histogram.js"></script>
     </head>
     <body>
-  
-
     <div id = "tableAndButton">
-        <table id="rates">
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>TO</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td><b>USD</b></td>
-            <td><b>EUR</b></td>
-            <td><b>JPY</b></td>
-            <td><b>GBP</b></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td><b>USD</b></td>
-            <td>1</td>
-            <td>$res.USD_EUR</td>
-            <td>$res.USD_JPY</td>
-            <td>$res.USD_GBP</td>
-          </tr>
-           <tr>
-            <td>FROM</td>
-            <td><b>EUR</b></td>
-            <td>$res.EUR_USD</td>
-            <td>1</td>
-            <td>$res.EUR_JPY</td>
-            <td>$res.EUR_GBP</td>
-          </tr>
-           <tr>
-            <td></td>
-            <td><b>JPY</b></td>
-            <td>$res.JPY_USD</td>
-            <td>$res.JPY_EUR</td>
-            <td>$1</td>
-            <td>$res.JPY_GBP</td>
-          </tr>
-           <tr>
-            <td></td>
-            <td><b>GBP</b></td>
-            <td>$res.GBP_USD</td>
-            <td>$res.GBP_EUR</td>
-            <td>$res.GBP_JPY</td>
-            <td>$1</td>
-          </tr>
-        </table>
+      <table id ="rates">
+        <tr>
+          <td></td>
+          <td><b>EUR</b></td>
+          <td><b>USD</b></td>
+          <td><b>JPY</b></b></td>
+          <td><b>GBP</b></td>
+          <td><b>CHF</b></td>
+          <td><b>AUD</b></td>
+          <td><b>CNY</b></td>
+          <td><b>HKD</b></td>
+          <td><b>KYD</b></td>
+        </tr>
+        $for rate in res.tableOfRate:
+          $if(loop.index0 %9 == 0):
+            <tr>
+              <td><b>$listOfRate[loop.index0/9]</b></td>
+          <td>$rate</td>
+          $if(loop.index %9 == 0):
+            </tr>
+          $if(loop.index == 81):
+            $break;
+      </table>
     </div>
+
+
     <table cellspacing="80" align = "center">
       <tr>
         <td style="background-color:white;border-radius: 32px"><div id="rate" style="width: 600px; height: 400px; margin: 0 auto"></div></td>

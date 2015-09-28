@@ -174,11 +174,7 @@ class Individual(object):
 
 class Currencies(object):
 
-    table = [[0]*2 for i in range(0,3)]
-    table[0][0]= 1
-    table[1][0]= 1
-    table[0][1]= 1
-    table[1][1]= 1
+    tableOfRate = []
 
     def __init__ (self):
         with open('currencies.json') as data_file:
@@ -194,6 +190,14 @@ class Currencies(object):
         self.CNY_CNY = Rate(1.000000, "CNY", "CNY")
         self.HKD_HKD = Rate(1.000000, "HKD", "HKD")
         self.KYD_KYD = Rate(1.000000, "KYD", "KYD")
+        self.setTableOfRate()
+
+    def setTableOfRate (self) :
+        listOfRate = ["EUR","USD","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+        for currencyFrom in range(0,len(listOfRate)):
+            for currencyTo in range(0,len(listOfRate)):
+                self.tableOfRate.append(self.getRateFromTo(listOfRate[currencyFrom],listOfRate[currencyTo]))
+
     def getRateFromTo(self, fromCurrency, toCurrency):
         return getattr(self, fromCurrency + "_" + toCurrency)
 
@@ -210,13 +214,15 @@ class Index(object):
         testBellmanFord = Individual(currencies)
         testBellmanFord.setWay(cycle)
         testBellmanFord.setTotalValue(currencies)
+        print len(currencies.tableOfRate)
         data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way}
         }
         print(len(vars(currencies)))
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)
-        return static.index(res = currencies)
+        listOfRate = ["EUR","USD","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+        return static.index(res = currencies, listOfRate = listOfRate)
 
 
 if __name__ == "__main__":
