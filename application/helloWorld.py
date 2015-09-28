@@ -87,8 +87,8 @@ def acceptance_probability(old_cost,new_cost,T):
 def anneal(currencies,nb_currencies):
     popInit = Individual(currencies)
     rateInit = popInit.getToTalValue(currencies)
-    T = 1.0
-    T_min = 0.00001
+    T = 0.00001
+    T_min = 0.0000001
     alpha = 0.9
     population = copy.deepcopy(popInit)
     population.changeNeighbor(currencies,nb_currencies)
@@ -142,20 +142,55 @@ class Population(object):
         selected = []
         count = 0
         nbOfDomination = 0
-        for i in self.pop:
-            print i
-        print("/////////////////")
         while count < sizePop :
             for individual in self.pop:
                 if self.nbOfDominations(individual) == nbOfDomination :
                     selected.append(individual)
                     count += 1
-                    print individual
-                    print self.nbOfDominations(individual)
                     if count == sizePop:
                         break
             nbOfDomination += 1
         return selected
+
+    def mutation(self,currencies):
+        listOfRate = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+        for individual in self.pop:
+            for currency in individual.way:
+                if currency != "USD":
+                    if random.random() > 0.01:
+                        currency = listOfRate[randint(0,7)]
+            individual.setIndividuals(currencies,individual.way)
+
+    def cross_over(self, selected, currencies):
+            listOfChild = []
+            while len(selected) != 0:
+                parent1 = random.choice(selected)
+                selected = [elem for elem in selected if elem != parent1]
+                parent2 = random.choice(selected)
+                selected = [elem for elem in selected if elem != parent2]
+                sizeIndividualWay = len(parent1.way)
+                sonWay1 = parent1.way[0:sizeIndividualWay/2] + parent2.way[sizeIndividualWay/2:sizeIndividualWay]
+                sonWay2 = parent2.way[0:sizeIndividualWay/2] + parent1.way[sizeIndividualWay/2:sizeIndividualWay]
+                son1 = Individual(currencies)
+                son2 = Individual(currencies)
+                son1.setIndividuals(currencies, sonWay1)
+                son2.setIndividuals(currencies, sonWay2)
+                listOfChild.append(son1)
+                listOfChild.append(son2)
+            return listOfChild
+
+    def evolution(self,currencies):
+        listOfValues = []
+        for i in range(0,3000):
+            parents = self.pareto(10)
+            kids = self.cross_over(parents,currencies)
+            self.setPoplation = parents + kids
+            self.mutation(currencies)
+        self.pop
+
+    def setPopulation(self,newPopulation):
+        self.pop = newPopulation
+
 
 
 class Individual(object):
@@ -186,8 +221,8 @@ class Individual(object):
         self.nbCurrencies = self.getNbCurrencies()
 
     def changeNeighbor(self,currencies,nb_currencies):
-        listOfRate = ["USD","EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
-        self.way[randint(1,nb_currencies - 1)]=listOfRate[randint(0,8)]
+        listOfRate = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+        self.way[randint(1,nb_currencies - 1)]=listOfRate[randint(0,7)]
         self.cleanWay()
         self.totalValue = self.getToTalValue(currencies)
 
@@ -216,6 +251,16 @@ class Individual(object):
         for i in range (0, len(wayWithoutNone)-1):
             totalValue = totalValue * currency.getRateFromTo(wayWithoutNone[i],wayWithoutNone[i+1]).value
         self.totalValue = totalValue
+
+    def setNbCurrencies(self):
+        newWay = [elem for elem in self.way if elem != "NONE"]
+        self.nbcurrencies = len(newWay)
+
+    def setIndividuals(self, currency, way):
+        self.setWay(way)
+        self.cleanWay()
+        self.setTotalValue(currency)
+        self.setNbCurrencies()
 
 class Currencies(object):
 
@@ -266,7 +311,9 @@ class Index(object):
                 json.dump(data, outfile)
         listOfRate = ["EUR","USD","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
         population = Population(currencies)
-        pareto = population.pareto(5)
+        population.evolution(currencies)
+        for ind in population.pop:
+            print ind
         return static.index(res = currencies, listOfRate = listOfRate)
 
 
