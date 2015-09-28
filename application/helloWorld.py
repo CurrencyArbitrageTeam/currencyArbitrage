@@ -118,10 +118,51 @@ class Rate(object):
     def __str__(self):
         return str(self.value)
 
+class Population(object):
+
+    pop = []
+
+    def __init__(self, currency):
+        for i in range(0,19):
+            self.pop.append(Individual(currency))
+
+    def nbOfDominations(self,individual):
+        numberOfDomination = 0
+        for population in self.pop:
+            if ((population.nbCurrencies < individual.nbCurrencies) & (population.totalValue > individual.totalValue)):
+                numberOfDomination += 1
+        return numberOfDomination
+
+    def isDominated(self,individual):
+        if self.nbOfDominations(individual) > 0 :
+            return True
+        return False
+
+    def pareto(self,sizePop):
+        selected = []
+        count = 0
+        nbOfDomination = 0
+        for i in self.pop:
+            print i
+        print("/////////////////")
+        while count < sizePop :
+            for individual in self.pop:
+                if self.nbOfDominations(individual) == nbOfDomination :
+                    selected.append(individual)
+                    count += 1
+                    print individual
+                    print self.nbOfDominations(individual)
+                    if count == sizePop:
+                        break
+            nbOfDomination += 1
+        return selected
+
+
 class Individual(object):
 
     way = []
     totalValue = 1
+    nbCurrencies = 0
 
     def getToTalValue(self, currency):
         totalValue = 1
@@ -142,6 +183,7 @@ class Individual(object):
         self.way = way
         self.cleanWay()
         self.totalValue = self.getToTalValue(currency)
+        self.nbCurrencies = self.getNbCurrencies()
 
     def changeNeighbor(self,currencies,nb_currencies):
         listOfRate = ["USD","EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
@@ -149,6 +191,9 @@ class Individual(object):
         self.cleanWay()
         self.totalValue = self.getToTalValue(currencies)
 
+    def getNbCurrencies(self):
+        fnewWay = [elem for elem in self.way if elem != "NONE"]
+        return len(fnewWay)
 
     def cleanWay(self):
         for i in range (0, len(self.way) - 1):
@@ -160,7 +205,7 @@ class Individual(object):
         wayToDisplay = []
         for i in range (len(self.way)):
             wayToDisplay.append(safe_list_get(self.way, i, "lol"))
-        return str(wayToDisplay ) + " " + str(self.totalValue)
+        return str(wayToDisplay ) + " " + str(self.totalValue) + " " + str(self.nbCurrencies)
 
     def setWay(self, way):
         self.way = way
@@ -214,14 +259,14 @@ class Index(object):
         testBellmanFord = Individual(currencies)
         testBellmanFord.setWay(cycle)
         testBellmanFord.setTotalValue(currencies)
-        print len(currencies.tableOfRate)
         data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way}
         }
-        print(len(vars(currencies)))
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)
         listOfRate = ["EUR","USD","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+        population = Population(currencies)
+        pareto = population.pareto(5)
         return static.index(res = currencies, listOfRate = listOfRate)
 
 
