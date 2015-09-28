@@ -181,7 +181,7 @@ class Population(object):
 
     def evolution(self,currencies):
         listOfValues = []
-        for i in range(0,3000):
+        for i in range(0,1000):
             parents = self.pareto(10)
             kids = self.cross_over(parents,currencies)
             self.setPoplation = parents + kids
@@ -190,8 +190,6 @@ class Population(object):
 
     def setPopulation(self,newPopulation):
         self.pop = newPopulation
-
-
 
 class Individual(object):
 
@@ -304,16 +302,19 @@ class Index(object):
         testBellmanFord = Individual(currencies)
         testBellmanFord.setWay(cycle)
         testBellmanFord.setTotalValue(currencies)
-        data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way}
-        }
+        t0_GA = time.time()
+        population = Population(currencies)
+        population.evolution(currencies)
+        res_GA = population.pop
+        res_GA.sort(key=lambda x: x.totalValue, reverse=True)
+        res_GA_final = res_GA[0]
+        t_final_GA = time.time() - t0_GA
+        data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way},
+        "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way}}
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)
         listOfRate = ["EUR","USD","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
-        population = Population(currencies)
-        population.evolution(currencies)
-        for ind in population.pop:
-            print ind
         return static.index(res = currencies, listOfRate = listOfRate)
 
 
