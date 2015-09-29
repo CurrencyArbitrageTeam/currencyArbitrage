@@ -34,8 +34,11 @@ $(function () {
               if ( this.series.name == "Annealing"){
                 return '<b>' + jsonValue.Annealing.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
+              if ( this.series.name == "GA_Annealing"){
+                return '<b>' + jsonValue.GA_Annealing.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
+              }
               else{
-                return '<b> Oops an error occured </b>';
+                return '<b>' + jsonValue.GA.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
 
             }
@@ -48,11 +51,15 @@ $(function () {
 
         }, {
             name: 'Genetic Algorithm',
-            data: [1]
+            data: [jsonValue.GA.totalRate]
 
         }, {
             name: 'Annealing',
             data: [jsonValue.Annealing.totalRate]
+
+        }, {
+            name: 'Genetic Algorithm + Annealing',
+            data: [jsonValue.GA_Annealing.totalRate]
 
         }]
     });
@@ -89,8 +96,11 @@ $(function () {
               if ( this.series.name == "Annealing"){
                 return '<b>' + jsonValue.Annealing.way + '</b><br><b>Time : </b>' + this.point.y + ' seconds';
               }
+              if ( this.series.name == "GA_Annealing"){
+                return '<b>' + jsonValue.GA_Annealing.way + '</b><br><b>Time : </b>' + this.point.y + ' seconds';
+              }
               else{
-                return '<b> Oops an error occured </b>';
+                return '<b>' + jsonValue.GA.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
 
             }
@@ -108,12 +118,60 @@ $(function () {
 
         }, {
             name: 'Genetic Algorithm',
-            data: [0.0001]
+            data: [jsonValue.GA.timer]
 
         }, {
             name: 'Annealing',
             data: [jsonValue.Annealing.timer]
 
+        }, {
+            name: 'Genetic Algorithm + Annealing',
+            data: [jsonValue.GA_Annealing.timer]
+
         }]
+    });
+});
+
+$(function () {
+
+    $('#convergence').highcharts({
+        title: {
+            text: 'Evolution of the population'
+        },
+        subtitle: {
+            text: 'Genetic Algorithm'
+        },
+        xAxis: {
+            tickInterval: 1,
+            gridLineWidth: 1,
+            title: {
+                enabled: true,
+                text: 'Iteration'
+            },
+            startOnTick: true,
+            endOnTick: true,
+            showLastLabel: true
+        },
+        yAxis: {
+            title: {
+                text: 'Rate (USD)'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+        series: [{
+            name: 'Individual',
+            type: 'scatter',
+            color: Highcharts.getOptions().colors[1],
+            data: jsonConvergence
+
+        }],
+        tooltip: {
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: 'Itérations n° {point.x}, {point.y} USD'
+        }
     });
 });

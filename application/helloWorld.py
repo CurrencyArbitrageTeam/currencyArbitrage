@@ -78,14 +78,16 @@ def bellmanFord(currency,nb_currencies):
                 break
         cycle.append(listOfRate[pre[z]])
 
-
     return cycle
 
 def acceptance_probability(old_cost,new_cost,T):
     return math.exp((new_cost - old_cost)/T)
 
-def anneal(currencies,nb_currencies):
-    popInit = Individual(currencies)
+def anneal(currencies,nb_currencies,**keyword_parameters):
+    if ('optional' in keyword_parameters):
+        popInit = keyword_parameters['optional']
+    else:
+        popInit = Individual(currencies)
     rateInit = popInit.getToTalValue(currencies)
     T = 0.00001
     T_min = 0.0000001
@@ -103,6 +105,8 @@ def anneal(currencies,nb_currencies):
                 rateInit = popInit.getToTalValue(currencies)
             i += 1
         T = T * alpha
+    newWay = []
+    popInit.clearWayForHtlm()
     return popInit
 
 class Rate(object):
@@ -123,13 +127,13 @@ class Population(object):
     pop = []
 
     def __init__(self, currency):
-        for i in range(0,19):
+        for i in range(0,40):
             self.pop.append(Individual(currency))
 
     def nbOfDominations(self,individual):
         numberOfDomination = 0
         for population in self.pop:
-            if ((population.nbCurrencies < individual.nbCurrencies) & (population.totalValue > individual.totalValue)):
+            if ((population.totalValue > individual.totalValue)):
                 numberOfDomination += 1
         return numberOfDomination
 
@@ -138,12 +142,12 @@ class Population(object):
             return True
         return False
 
-    def pareto(self,sizePop):
+    def pareto(self,pop,sizePop):
         selected = []
         count = 0
         nbOfDomination = 0
         while count < sizePop :
-            for individual in self.pop:
+            for individual in pop:
                 if self.nbOfDominations(individual) == nbOfDomination :
                     selected.append(individual)
                     count += 1
@@ -152,14 +156,15 @@ class Population(object):
             nbOfDomination += 1
         return selected
 
-    def mutation(self,currencies):
+    def mutation(self,pop,currencies):
         listOfRate = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
-        for individual in self.pop:
+        for individual in pop:
             for currency in individual.way:
                 if currency != "USD":
-                    if random.random() > 0.01:
+                    if random.random() < 0.1:
                         currency = listOfRate[randint(0,7)]
             individual.setIndividuals(currencies,individual.way)
+        return pop
 
     def cross_over(self, selected, currencies):
             listOfChild = []
@@ -169,8 +174,19 @@ class Population(object):
                 parent2 = random.choice(selected)
                 selected = [elem for elem in selected if elem != parent2]
                 sizeIndividualWay = len(parent1.way)
-                sonWay1 = parent1.way[0:sizeIndividualWay/2] + parent2.way[sizeIndividualWay/2:sizeIndividualWay]
-                sonWay2 = parent2.way[0:sizeIndividualWay/2] + parent1.way[sizeIndividualWay/2:sizeIndividualWay]
+                sonWay1 = []
+                sonWay2 = []
+                sizeIndex = 0
+                while sizeIndex != sizeIndividualWay:
+                    if random.random() < 0.5:
+                        sonWay1.append(safe_list_get(parent1.way, sizeIndex, "Not found"))
+                    else:
+                        sonWay1.append(safe_list_get(parent2.way, sizeIndex, "Not found"))
+                    if random.random() < 0.5:
+                        sonWay2.append(safe_list_get(parent1.way, sizeIndex, "Not found"))
+                    else:
+                        sonWay2.append(safe_list_get(parent2.way, sizeIndex, "Not found"))
+                    sizeIndex += 1
                 son1 = Individual(currencies)
                 son2 = Individual(currencies)
                 son1.setIndividuals(currencies, sonWay1)
@@ -180,16 +196,29 @@ class Population(object):
             return listOfChild
 
     def evolution(self,currencies):
-        listOfValues = []
-        for i in range(0,1000):
-            parents = self.pareto(10)
+        convergenceVisualisation = []
+        parents = copy.deepcopy(self.pop)
+        parents = self.pareto(parents,40)
+        for i in range(0,30):
+            for j in parents:
+                individualPosition = []
+                individualPosition.append(i)
+                individualPosition.append(j.totalValue)
+                convergenceVisualisation.append(individualPosition)
             kids = self.cross_over(parents,currencies)
-            self.setPoplation = parents + kids
-            self.mutation(currencies)
-        self.pop
+            pop = copy.deepcopy(parents + kids )
+            popMutated = self.mutation(pop,currencies)
+            popRanked = self.pareto(popMutated,40)
+            parents = copy.deepcopy(popRanked)
+        with open('static/convergence.js', 'w') as outfile:
+                outfile.write("var jsonConvergence =")
+                json.dump(convergenceVisualisation, outfile)
+        self.pop = copy.deepcopy(parents)
 
-    def setPopulation(self,newPopulation):
-        self.pop = newPopulation
+
+    def setPopulation(self,newPopulation,popSize):
+        for i in range(0,popSize):
+            self.pop.append(newPopulation[i])
 
 class Individual(object):
 
@@ -210,7 +239,7 @@ class Individual(object):
         way = []
         listOfRate = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
         way.append("USD")
-        for i in range (0,9):
+        for i in range (0,len(listOfRate)):
             way.append(random.choice(listOfRate))
         way.append("USD")
         self.way = way
@@ -260,6 +289,13 @@ class Individual(object):
         self.setTotalValue(currency)
         self.setNbCurrencies()
 
+    def clearWayForHtlm(self):
+            newWay = []
+            for i in range (0, len(self.way)):
+                if safe_list_get(self.way, i, "lol") != "NONE":
+                    newWay.append( safe_list_get(self.way, i, "lol"))
+            self.way = newWay
+
 class Currencies(object):
 
     tableOfRate = []
@@ -293,9 +329,6 @@ class Index(object):
     def GET(self):
         currencies = Currencies()
         individual = Individual(currencies)
-        t0_anneal = time.time()
-        res_anneal = anneal(currencies,9)
-        t_final_anneal = time.time() - t0_anneal
         t0_bellman = time.time()
         cycle = bellmanFord(currencies,9)
         t_final_bellman = time.time() - t0_bellman
@@ -308,15 +341,21 @@ class Index(object):
         res_GA = population.pop
         res_GA.sort(key=lambda x: x.totalValue, reverse=True)
         res_GA_final = res_GA[0]
+        res_for_anneal = copy.deepcopy(res_GA_final)
+        res_GA_final.clearWayForHtlm()
         t_final_GA = time.time() - t0_GA
+        res_anneal_GA = anneal(currencies,9,optional=res_for_anneal)
+        t_final_anneal_GA = time.time() - t0_GA
+        t0_anneal = time.time()
+        res_anneal = anneal(currencies,9)
+        t_final_anneal = time.time() - t0_anneal
         data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way},
-        "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way}}
+        "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way},"GA_Annealing" :{ 'timer' : t_final_anneal_GA, 'totalRate':res_anneal_GA.totalValue, 'way':res_anneal_GA.way}}
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)
         listOfRate = ["EUR","USD","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
         return static.index(res = currencies, listOfRate = listOfRate)
-
 
 if __name__ == "__main__":
     app.run()
