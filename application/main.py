@@ -9,6 +9,7 @@ import sys
 import copy
 import math
 import time
+import itertools
 
 urls = (
   '/', 'Index',
@@ -20,6 +21,23 @@ app = web.application(urls, globals())
 static = web.template.render('static/')
 template = web.template.render('templates/')
 
+def getGlobalMax(currency):
+    stuff = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+    maxi = 1
+    bestWay = []
+    for L in range(1, len(stuff)+1):
+        for subset in itertools.permutations(stuff, L):
+            way = ["USD"]
+            way = way + list(subset)
+            way.append("USD")
+            totalValue = 1
+            for i in range (1, len(way)):
+                totalValue = currency.getRateFromTo(safe_list_get(way, i - 1, "lol"), safe_list_get(way, i, "lol")).value * totalValue
+            if totalValue > maxi:
+                maxi = totalValue
+                bestWay = way
+    print maxi
+    print bestWay
 
 def safe_list_get (l, idx, default):
     try:
@@ -367,6 +385,10 @@ class Index(object):
         t0_anneal = time.time()
         res_anneal = anneal(currencies,9)
         t_final_anneal = time.time() - t0_anneal
+        t0_getMax = time.time()
+        getGlobalMax(currencies)
+        t0_getMax_final = time.time() - t0_getMax
+        print t0_getMax_final
         data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way},
         "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way},"GA_Annealing" :{ 'timer' : t_final_anneal_GA, 'totalRate':res_anneal_GA.totalValue, 'way':res_anneal_GA.way}}
         with open('static/result.js', 'w') as outfile:
