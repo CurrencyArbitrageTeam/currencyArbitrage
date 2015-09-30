@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import json
 
-currenciesFile = open("currencies.json", 'w')
+currenciesFile = open("../application/currencies.json", 'w')
 currencies=["AUD","CHF","CNY","EUR","GBP","HKD","JPY","KYD","USD"]
 mapCurrencies = dict()
 for currencyFrom in currencies:
