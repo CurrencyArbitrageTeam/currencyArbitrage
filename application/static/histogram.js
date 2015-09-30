@@ -209,9 +209,53 @@ $(function () {
         },
         series: [{
             name: 'Individual',
-            type: 'scatter',
             color: Highcharts.getOptions().colors[1],
             data: jsonConvergenceCurrencies
+
+        }],
+        tooltip: {
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: 'Itérations n° {point.x}, {point.y} currency number'
+        }
+    });
+});
+
+$(function () {
+
+    $('#convergenceAnnealing').highcharts({
+        title: {
+            text: 'Evolution of the population'
+        },
+        chart:{
+          zoomType: 'x',
+        },
+        subtitle: {
+            text: 'Simulated Annealing'
+        },
+        xAxis: {
+            reversed: true,
+            gridLineWidth: 1,
+            title: {
+                enabled: true,
+                text: 'Temperature'
+            },
+            showLastLabel: true
+        },
+        yAxis: {
+            title: {
+                text: 'Rate'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+        series: [{
+            name: 'Individual',
+            type: 'scatter',
+            color: Highcharts.getOptions().colors[1],
+            data: jsonConvergenceAnnealing
 
         }],
         tooltip: {

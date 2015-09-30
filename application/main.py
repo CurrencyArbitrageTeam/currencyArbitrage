@@ -89,6 +89,7 @@ def anneal(currencies,nb_currencies,**keyword_parameters):
     else:
         popInit = Individual(currencies)
     rateInit = popInit.getToTalValue(currencies)
+    convergenceAnnealing = []
     T = 0.00001
     T_min = 0.0000001
     alpha = 0.9
@@ -96,6 +97,7 @@ def anneal(currencies,nb_currencies,**keyword_parameters):
     population.changeNeighbor(currencies,nb_currencies)
     while T > T_min :
         i = 1
+        popAnnealing = []
         while i <= 100:
             population.changeNeighbor(currencies,nb_currencies)
             costNeighbor = population.getToTalValue(currencies)
@@ -105,6 +107,12 @@ def anneal(currencies,nb_currencies,**keyword_parameters):
                 rateInit = popInit.getToTalValue(currencies)
             i += 1
         T = T * alpha
+        popAnnealing.append(T)
+        popAnnealing.append(rateInit)
+        convergenceAnnealing.append(popAnnealing)
+    with open('static/annealing.js', 'w') as outfile:
+            outfile.write(" var jsonConvergenceAnnealing =")
+            json.dump(convergenceAnnealing, outfile)
     newWay = []
     popInit.clearWayForHtlm()
     return popInit
@@ -222,6 +230,7 @@ class Population(object):
                 json.dump(convergenceVisualisationRate, outfile)
                 outfile.write(";\n var jsonConvergenceCurrencies =")
                 json.dump(convergenceVisualisationCurrency, outfile)
+
         self.pop = copy.deepcopy(parents)
 
 
