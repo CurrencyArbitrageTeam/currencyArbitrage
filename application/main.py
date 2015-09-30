@@ -133,7 +133,7 @@ class Population(object):
     def nbOfDominations(self,individual):
         numberOfDomination = 0
         for population in self.pop:
-            if ((population.totalValue > individual.totalValue)):
+            if ((population.nbCurrencies <= individual.nbCurrencies) & (population.totalValue > individual.totalValue)):
                 numberOfDomination += 1
         return numberOfDomination
 
@@ -196,23 +196,32 @@ class Population(object):
             return listOfChild
 
     def evolution(self,currencies):
-        convergenceVisualisation = []
+        convergenceVisualisationRate = []
+        convergenceVisualisationCurrency = []
         parents = copy.deepcopy(self.pop)
         parents = self.pareto(parents,40)
-        for i in range(0,30):
+        for i in range(0,20):
+            summNbCurrencies = 0
+            populationNbCurrencies = []
             for j in parents:
-                individualPosition = []
-                individualPosition.append(i)
-                individualPosition.append(j.totalValue)
-                convergenceVisualisation.append(individualPosition)
+                summNbCurrencies += j.nbCurrencies
+                individualPositionRate = []
+                individualPositionRate.append(i)
+                individualPositionRate.append(j.totalValue)
+                convergenceVisualisationRate.append(individualPositionRate)
+            populationNbCurrencies.append(i)
+            populationNbCurrencies.append(float(summNbCurrencies)/float(len(parents)))
+            convergenceVisualisationCurrency.append(populationNbCurrencies)
             kids = self.cross_over(parents,currencies)
             pop = copy.deepcopy(parents + kids )
             popMutated = self.mutation(pop,currencies)
             popRanked = self.pareto(popMutated,40)
             parents = copy.deepcopy(popRanked)
         with open('static/convergence.js', 'w') as outfile:
-                outfile.write("var jsonConvergence =")
-                json.dump(convergenceVisualisation, outfile)
+                outfile.write("var jsonConvergenceRate =")
+                json.dump(convergenceVisualisationRate, outfile)
+                outfile.write(";\n var jsonConvergenceCurrencies =")
+                json.dump(convergenceVisualisationCurrency, outfile)
         self.pop = copy.deepcopy(parents)
 
 

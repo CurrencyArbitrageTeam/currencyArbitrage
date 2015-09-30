@@ -100,7 +100,7 @@ $(function () {
                 return '<b>' + jsonValue.GA_Annealing.way + '</b><br><b>Time : </b>' + this.point.y + ' seconds';
               }
               else{
-                return '<b>' + jsonValue.GA.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
+                return '<b>' + jsonValue.GA.way + ' <br> <b>Time :</b> ' + this.point.y + ' seconds';
               }
 
             }
@@ -134,7 +134,7 @@ $(function () {
 
 $(function () {
 
-    $('#convergence').highcharts({
+    $('#convergenceRate').highcharts({
         title: {
             text: 'Evolution of the population'
         },
@@ -166,12 +166,57 @@ $(function () {
             name: 'Individual',
             type: 'scatter',
             color: Highcharts.getOptions().colors[1],
-            data: jsonConvergence
+            data: jsonConvergenceRate
 
         }],
         tooltip: {
             headerFormat: '<b>{series.name}</b><br>',
             pointFormat: 'Itérations n° {point.x}, {point.y} USD'
+        }
+    });
+});
+
+
+$(function () {
+
+    $('#convergenceCurrencies').highcharts({
+        title: {
+            text: 'Evolution of the population'
+        },
+        subtitle: {
+            text: 'Genetic Algorithm'
+        },
+        xAxis: {
+            tickInterval: 1,
+            gridLineWidth: 1,
+            title: {
+                enabled: true,
+                text: 'Iteration'
+            },
+            startOnTick: true,
+            endOnTick: true,
+            showLastLabel: true
+        },
+        yAxis: {
+            title: {
+                text: 'Currencies Number'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+        series: [{
+            name: 'Individual',
+            type: 'scatter',
+            color: Highcharts.getOptions().colors[1],
+            data: jsonConvergenceCurrencies
+
+        }],
+        tooltip: {
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: 'Itérations n° {point.x}, {point.y} currency number'
         }
     });
 });
