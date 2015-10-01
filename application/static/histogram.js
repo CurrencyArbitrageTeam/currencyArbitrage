@@ -31,13 +31,16 @@ $(function () {
               if ( this.series.name == "BellmanFord"){
                 return '<b>' + jsonValue.BellmanFord.way + '<br> <b>Rate : </b>' + this.point.y + '</b>';
               }
-              if ( this.series.name == "Annealing"){
+              else if ( this.series.name == "Annealing"){
                 return '<b>' + jsonValue.Annealing.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
-              if ( this.series.name == "GA_Annealing"){
+              else if ( this.series.name == "GA_Annealing"){
                 return '<b>' + jsonValue.GA_Annealing.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
-              else{
+              else if ( this.series.name == "Best individual"){
+                return '<b>' + jsonValue.bestIndividual.way + ' <br> <b>Rate:</b> ' + this.point.y + '</b>';
+              }
+              else if ( this.series.name == "Genetic Algorithm"){
                 return '<b>' + jsonValue.GA.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
 
@@ -60,6 +63,10 @@ $(function () {
         }, {
             name: 'Genetic Algorithm + Annealing',
             data: [jsonValue.GA_Annealing.totalRate]
+
+        }, {
+            name: 'Best individual',
+            data: [jsonValue.bestIndividual.totalRate]
 
         }]
     });
@@ -99,6 +106,9 @@ $(function () {
               if ( this.series.name == "GA_Annealing"){
                 return '<b>' + jsonValue.GA_Annealing.way + '</b><br><b>Time : </b>' + this.point.y + ' seconds';
               }
+              if ( this.series.name == "Best individual"){
+                return '<b>' + jsonValue.bestIndividual.way + ' <br> <b>Time :</b> ' + this.point.y + 'seconds';
+              }
               else{
                 return '<b>' + jsonValue.GA.way + ' <br> <b>Time :</b> ' + this.point.y + ' seconds';
               }
@@ -128,6 +138,10 @@ $(function () {
             name: 'Genetic Algorithm + Annealing',
             data: [jsonValue.GA_Annealing.timer]
 
+        }, {
+            name: 'Best individual',
+            data: [jsonValue.bestIndividual.timer]
+
         }]
     });
 });
@@ -155,7 +169,19 @@ $(function () {
         yAxis: {
             title: {
                 text: 'Rate (USD)'
-            }
+            },
+            plotLines: [{
+                value: jsonValue.bestIndividual.totalRate,
+                color: 'red',
+                width: 1,
+                label: {
+                    text: 'Maximum',
+                    align: 'center',
+                    style: {
+                        color: 'gray'
+                    }
+                }
+            }]
         },
         legend: {
             layout: 'vertical',
@@ -244,7 +270,19 @@ $(function () {
         yAxis: {
             title: {
                 text: 'Rate'
-            }
+            },
+            plotLines: [{
+                value: jsonValue.bestIndividual.totalRate,
+                color: 'red',
+                width: 1,
+                label: {
+                    text: 'Maximum',
+                    align: 'center',
+                    style: {
+                        color: 'gray'
+                    }
+                }
+            }]
         },
         legend: {
             layout: 'vertical',
@@ -257,10 +295,16 @@ $(function () {
             color: Highcharts.getOptions().colors[1],
             data: jsonConvergenceAnnealing
 
+        }, {
+            name: 'Maximum',
+            type: 'scatter',
+            color: Highcharts.getOptions().colors[2],
+            data: jsonValue.bestIndividual.totalRate
+
         }],
         tooltip: {
             headerFormat: '<b>{series.name}</b><br>',
-            pointFormat: 'Itérations n° {point.x}, {point.y} currency number'
+            pointFormat: 'Températures n° {point.x}, {point.y} currency number'
         }
     });
 });

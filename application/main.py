@@ -36,8 +36,9 @@ def getGlobalMax(currency):
             if totalValue > maxi:
                 maxi = totalValue
                 bestWay = way
-    print maxi
-    print bestWay
+    maximumRate = Individual(currency)
+    maximumRate.setIndividuals(currency, bestWay)
+    return maximumRate
 
 def safe_list_get (l, idx, default):
     try:
@@ -153,7 +154,7 @@ class Population(object):
     pop = []
 
     def __init__(self, currency):
-        for i in range(0,40):
+        for i in range(0,60):
             self.pop.append(Individual(currency))
 
     def nbOfDominations(self,individual):
@@ -184,12 +185,17 @@ class Population(object):
 
     def mutation(self,pop,currencies):
         listOfRate = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+        newWay = []
+        newWay.append("USD")
         for individual in pop:
             for currency in individual.way:
                 if currency != "USD":
-                    if random.random() < 0.1:
-                        currency = listOfRate[randint(0,7)]
-            individual.setIndividuals(currencies,individual.way)
+                    if random.random() < 0.4:
+                        newWay.append(random.choice(listOfRate))
+                    else:
+                        newWay.append(currency)
+        newWay.append("USD")
+        individual.setIndividuals(currencies,individual.way)
         return pop
 
     def cross_over(self, selected, currencies):
@@ -225,8 +231,8 @@ class Population(object):
         convergenceVisualisationRate = []
         convergenceVisualisationCurrency = []
         parents = copy.deepcopy(self.pop)
-        parents = self.pareto(parents,40)
-        for i in range(0,20):
+        parents = self.pareto(parents,60)
+        for i in range(0,15):
             summNbCurrencies = 0
             populationNbCurrencies = []
             for j in parents:
@@ -241,7 +247,7 @@ class Population(object):
             kids = self.cross_over(parents,currencies)
             pop = copy.deepcopy(parents + kids )
             popMutated = self.mutation(pop,currencies)
-            popRanked = self.pareto(popMutated,40)
+            popRanked = self.pareto(popMutated,60)
             parents = copy.deepcopy(popRanked)
         with open('static/convergence.js', 'w') as outfile:
                 outfile.write("var jsonConvergenceRate =")
@@ -386,11 +392,13 @@ class Index(object):
         res_anneal = anneal(currencies,9)
         t_final_anneal = time.time() - t0_anneal
         t0_getMax = time.time()
-        getGlobalMax(currencies)
-        t0_getMax_final = time.time() - t0_getMax
-        print t0_getMax_final
-        data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },"Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way},
-        "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way},"GA_Annealing" :{ 'timer' : t_final_anneal_GA, 'totalRate':res_anneal_GA.totalValue, 'way':res_anneal_GA.way}}
+        bestIndividual = getGlobalMax(currencies)
+        t_final_getMax = time.time() - t0_getMax
+        data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },
+        "Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way},
+        "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way},
+        "GA_Annealing" :{ 'timer' : t_final_anneal_GA, 'totalRate':res_anneal_GA.totalValue, 'way':res_anneal_GA.way},
+        "bestIndividual" :{"timer" : t_final_getMax, "totalRate": bestIndividual.totalValue, "way": bestIndividual.way}}
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)
