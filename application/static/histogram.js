@@ -18,7 +18,12 @@ $(function () {
             min: 1,
             title: {
                 text: 'Rate (USD)'
-            }
+            },
+            plotLines: [{
+                value: jsonValue.top1percent,
+                color: 'red',
+                width: 1
+            }]
         },
         plotOptions: {
             column: {
@@ -34,7 +39,7 @@ $(function () {
               else if ( this.series.name == "Annealing"){
                 return '<b>' + jsonValue.Annealing.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
-              else if ( this.series.name == "GA_Annealing"){
+              else if ( this.series.name == "Genetic Algorithm + Annealing"){
                 return '<b>' + jsonValue.GA_Annealing.way + ' <br> <b>Rate :</b> ' + this.point.y + '</b>';
               }
               else if ( this.series.name == "Best individual"){

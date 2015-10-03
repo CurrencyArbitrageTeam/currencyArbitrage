@@ -416,7 +416,8 @@ class Index(object):
         "Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way},
         "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way},
         "GA_Annealing" :{ 'timer' : t_final_anneal_GA, 'totalRate':res_anneal_GA.totalValue, 'way':res_anneal_GA.way},
-        "bestIndividual" :{"timer" : t_final_getMax, "totalRate": globalMax.totalValue, "way": globalMax.way}}
+        "bestIndividual" :{"timer" : t_final_getMax, "totalRate": globalMax.totalValue, "way": globalMax.way},
+        "top1percent" : top1percent.totalValue}
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)
