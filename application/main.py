@@ -1,6 +1,7 @@
 from urlparse import urlunparse
 from sets import Set
 from random import randint
+from operator import itemgetter
 import random
 import web
 import json
@@ -10,6 +11,7 @@ import copy
 import math
 import time
 import itertools
+
 
 urls = (
   '/', 'Index',
@@ -39,6 +41,19 @@ def getGlobalMax(currency):
     maximumRate = Individual(currency)
     maximumRate.setIndividuals(currency, bestWay)
     return maximumRate
+
+def getWholePop(currency):
+    stuff = ["EUR","JPY","GBP","CHF","AUD","CNY","HKD","KYD"]
+    pop = []
+    for L in range(1, len(stuff)+1):
+        for subset in itertools.permutations(stuff, L):
+            individual = Individual(currency)
+            way = ["USD"]
+            way = way + list(subset)
+            way.append("USD")
+            individual.setIndividuals(currency,way)
+            pop.append(individual)
+    return pop
 
 def safe_list_get (l, idx, default):
     try:
@@ -392,13 +407,16 @@ class Index(object):
         res_anneal = anneal(currencies,9)
         t_final_anneal = time.time() - t0_anneal
         t0_getMax = time.time()
-        bestIndividual = getGlobalMax(currencies)
+        globalMax = getGlobalMax(currencies)
         t_final_getMax = time.time() - t0_getMax
+        globalPop = getWholePop(currencies)
+        globalPop.sort(key=lambda x: x.totalValue, reverse=True)
+        top1percent = globalPop[len(globalPop)/100]
         data = {"BellmanFord" :{ 'timer': t_final_bellman, 'totalRate':testBellmanFord.totalValue, 'way':testBellmanFord.way },
         "Annealing" :{ 'timer' : t_final_anneal, 'totalRate':res_anneal.totalValue, 'way':res_anneal.way},
         "GA" :{ 'timer' : t_final_GA, 'totalRate':res_GA_final.totalValue, 'way':res_GA_final.way},
         "GA_Annealing" :{ 'timer' : t_final_anneal_GA, 'totalRate':res_anneal_GA.totalValue, 'way':res_anneal_GA.way},
-        "bestIndividual" :{"timer" : t_final_getMax, "totalRate": bestIndividual.totalValue, "way": bestIndividual.way}}
+        "bestIndividual" :{"timer" : t_final_getMax, "totalRate": globalMax.totalValue, "way": globalMax.way}}
         with open('static/result.js', 'w') as outfile:
                 outfile.write("var json =")
                 json.dump(data, outfile)
